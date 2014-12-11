@@ -1,0 +1,16 @@
+---
+- hosts: "{{ target }}"
+  tasks:
+  - name: install or upgrade packages
+    yum:
+      state: latest
+      name: "{{ item }}"
+    with_items:
+    - bash
+    - tcsh
+    - zsh
+    when: ansible_distribution == 'CentOS'
+
+#
+# [EOF]
+#

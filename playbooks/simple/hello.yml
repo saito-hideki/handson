@@ -1,0 +1,16 @@
+---
+- hosts: sns
+  vars:
+    hello: "Hello, World!"
+    hello_file: "sample.txt"
+  tasks:
+  - name: create sample file
+    template:
+      src: "{{ hello_file }}.j2"
+      dest: /tmp/sample.txt
+  - name: "show {{ hello_file }}"
+    command: "cat /tmp/{{ hello_file }}"
+
+#
+# [EOF]
+#
