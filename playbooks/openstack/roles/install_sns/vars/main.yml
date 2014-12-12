@@ -1,0 +1,23 @@
+---
+spec:
+  web:
+    app_name: "sample-app"
+    project_url: "https://github.com/josug-book1-materials/sample-app.git"
+    init_script: "install_web.sh"
+    startup_script: "web.init.sh"
+    init_script_version: "v1.0"
+  app:
+    app_name: "sample-app"
+    project_url: "https://github.com/josug-book1-materials/sample-app.git"
+    init_script: "install_rest.sh"
+    startup_script: "rest.init.sh"
+    init_script_version: "v1.0"
+  dbs:
+    app_name: "sample-app"
+    project_url: "https://github.com/josug-book1-materials/sample-app.git"
+    init_script: "install_db.sh"
+    init_script_version: "v1.0"
+
+#
+# [EOF]
+#

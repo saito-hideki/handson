@@ -1,0 +1,29 @@
+---
+- name: change the timezone
+  command: cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+  when: target in ["web", "app", "dbs"]
+
+- name: checkout app from github
+  git:
+    repo: "{{ spec[target].project_url }}"
+    version: "{{ spec[target].init_script_version }}"
+    dest: /root/{{ spec[target].app_name }}
+  when: target in ["web", "app", "dbs"]
+
+- name: execute install script
+  raw: sh /root/{{ spec[target].app_name }}/server-setup/{{ spec[target].init_script }}
+  when: target in ["web", "app", "dbs"]
+
+- name: copy endpoint.conf to web and app server
+  template:
+      src: endpoint.conf.j2
+      dest: /root/{{ spec[target].app_name }}/endpoint.conf
+      owner: root
+      group: root
+      mode: 0644
+  notify: startup service
+  when: target in ["web", "app"]
+
+#
+# [EOF]
+#

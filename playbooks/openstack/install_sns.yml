@@ -7,53 +7,8 @@
 
   remote_user: root
 
-  vars:
-    spec:
-      web:
-        app_name: "sample-app"
-        project_url: "https://github.com/josug-book1-materials/sample-app.git"
-        init_script: "install_web.sh"
-        startup_script: "web.init.sh"
-        init_script_version: "v1.0"
-      app:
-        app_name: "sample-app"
-        project_url: "https://github.com/josug-book1-materials/sample-app.git"
-        init_script: "install_rest.sh"
-        startup_script: "rest.init.sh"
-        init_script_version: "v1.0"
-      dbs:
-        app_name: "sample-app"
-        project_url: "https://github.com/josug-book1-materials/sample-app.git"
-        init_script: "install_db.sh"
-        init_script_version: "v1.0"
-
-  tasks:
-  - name: change the timezone
-    command: cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
-    when: target in ["web", "app", "dbs"]
-  - name: checkout app from github
-    git:
-      repo: "{{ spec[target].project_url }}"
-      version: "{{ spec[target].init_script_version }}"
-      dest: /root/{{ spec[target].app_name }}
-    when: target in ["web", "app", "dbs"]
-  - name: execute install script
-    raw: sh /root/{{ spec[target].app_name }}/server-setup/{{ spec[target].init_script }}
-    when: target in ["web", "app", "dbs"]
-  - name: copy endpoint.conf to web and app server
-    template:
-        src: endpoint.conf.j2
-        dest: /root/{{ spec[target].app_name }}/endpoint.conf
-        owner: root
-        group: root
-        mode: 0644
-    notify: startup service
-    when: target in ["web", "app"]
-
-  handlers:
-    - name: startup service
-      shell: nohup /bin/bash /root/{{ spec[target].app_name }}/server-setup/{{ spec[target].startup_script }} start
-
+  roles:
+    - install_sns
 #
 # [EOF]
 #

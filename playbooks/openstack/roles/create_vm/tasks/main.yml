@@ -1,0 +1,48 @@
+---
+- name: ansible_python_interpreter setup
+  set_fact: ansible_python_interpreter="{{ lookup('pipe', 'which python') }}"
+
+- name: get uuid for generate hostname
+  command: /usr/bin/uuidgen
+  register: result_uuid
+  when: target in ["web", "app", "dbs"]
+
+- name: create {{ target }}-server on nova-compute with floating_ip
+  nova_compute:
+    state: present
+    auth_url: "{{ auth.url }}"
+    region_name: "{{ auth.region_name }}"
+    login_tenant_name: "{{ auth.tenant_name }}"
+    login_username: "{{ auth.username }}"
+    login_password: "{{ auth.password }}"
+    availability_zone: "{{ spec[target].availability_zone }}"
+    flavor_ram: "{{ spec[target].flavor_ram }}"
+    flavor_include: "{{ spec[target].flavor_name }}"
+    floating_ip_pools: "{{ networks.os_ext_net_list }}"
+    image_name: "{{ spec[target].image_name }}"
+    key_name: "{{  spec[target].key_name }}"
+    name: "{{ target }}-{{ result_uuid.stdout }}"
+    nics: "{{ spec[target].networks }}"
+    security_groups: "{{ spec[target].secgroups }}"
+  when: (target == "web") and (spec[target].floating_ip)
+
+- name: create {{ target }}-server on nova-compute without floating_ip
+  nova_compute:
+    state: present
+    auth_url: "{{ auth.url }}"
+    region_name: "{{ auth.region_name }}"
+    login_tenant_name: "{{ auth.tenant_name }}"
+    login_username: "{{ auth.username }}"
+    login_password: "{{ auth.password }}"
+    availability_zone: "{{ spec[target].availability_zone }}"
+    flavor_ram: "{{ spec[target].flavor_ram }}"
+    flavor_include: "{{ spec[target].flavor_name }}"
+    image_name: "{{ spec[target].image_name }}"
+    key_name: "{{  spec[target].key_name }}"
+    name: "{{ target }}-{{ result_uuid.stdout }}"
+    nics: "{{ spec[target].networks }}"
+    security_groups: "{{ spec[target].secgroups }}"
+  when: (target in ["app","dbs"]) and (not spec[target].floating_ip)
+#
+# [EOF]
+#
