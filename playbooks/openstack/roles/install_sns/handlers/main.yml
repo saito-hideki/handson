@@ -1,0 +1,7 @@
+---
+- name: startup service
+  shell: nohup /bin/bash /root/{{ spec[target].app_name }}/server-setup/{{ spec[target].startup_script }} start
+
+#
+# [EOF]
+#
