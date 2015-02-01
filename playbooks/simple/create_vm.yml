@@ -38,7 +38,7 @@
       flavor_include: "{{ spec.flavor_name }}"
       image_name: "{{ spec.image_name }}"
       key_name: "{{ spec.key_name }}"
-      name: "{{ spec.host_prefix }}-{{ result_uuid.stdout }}"
+      name: "{{ spec.host_prefix }}-test-{{ result_uuid.stdout }}"
       security_groups: "{{ spec.secgroups }}"
       insecure: True
 
