@@ -1,0 +1,47 @@
+---
+#
+# Usage: ansible-playbook -i inventory create_vm.yml
+# Required: ansible-v1.8 or later and openrc
+#
+- hosts: localhost
+
+  vars:
+    auth:
+      url: "{{ lookup('env', 'OS_AUTH_URL') }}"
+      region_name: "{{ lookup('env', 'OS_REGION_NAME') }}"
+      tenant_name: "{{ lookup('env', 'OS_TENANT_NAME') }}"
+      username: "{{ lookup('env', 'OS_USERNAME') }}"
+      password: "{{ lookup('env', 'OS_PASSWORD') }}"
+    spec:
+      host_prefix: "{{ lookup('pipe', 'hostname | cut -b 1-9') }}"
+      flavor_ram: 1024
+      flavor_name: "standard.xsmall"
+      image_name: "centos-base"
+      key_name: "default"
+      secgroups: "default"
+
+  tasks:
+  - name: ansible_python_interpreter setup
+    set_fact: ansible_python_interpreter="{{ lookup('pipe', 'which python') }}"
+  - name: get uuid for generate hostname
+    command: /usr/bin/uuidgen
+    register: result_uuid
+  - name: creating server
+    nova_compute:
+      state: present
+      auth_url: "{{ auth.url }}"
+      region_name: "{{ auth.region_name }}"
+      login_tenant_name: "{{ auth.tenant_name }}"
+      login_username: "{{ auth.username }}"
+      login_password: "{{ auth.password }}"
+      flavor_ram: "{{ spec.flavor_ram }}"
+      flavor_include: "{{ spec.flavor_name }}"
+      image_name: "{{ spec.image_name }}"
+      key_name: "{{ spec.key_name }}"
+      name: "{{ spec.host_prefix }}-{{ result_uuid.stdout }}"
+      security_groups: "{{ spec.secgroups }}"
+      insecure: True
+
+#
+# [EOF]
+#
